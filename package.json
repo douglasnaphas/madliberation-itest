@@ -1,0 +1,22 @@
+{
+  "name": "madliberation-itest",
+  "version": "1.0.0",
+  "description": "Browser-based tests of the Mad Liberation web app",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/douglasnaphas/madliberation-itest.git"
+  },
+  "keywords": [
+    "puppeteer"
+  ],
+  "author": "Douglas Naphas",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/douglasnaphas/madliberation-itest/issues"
+  },
+  "homepage": "https://github.com/douglasnaphas/madliberation-itest#readme"
+}
