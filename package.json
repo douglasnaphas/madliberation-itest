@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/douglasnaphas/madliberation-itest/issues"
   },
-  "homepage": "https://github.com/douglasnaphas/madliberation-itest#readme"
+  "homepage": "https://github.com/douglasnaphas/madliberation-itest#readme",
+  "dependencies": {
+    "puppeteer": "^1.11.0"
+  }
 }
