@@ -4,7 +4,10 @@ if (process.argv.length < 3) {
 }
 const site = process.argv[2];
 (async () => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    headless: true,
+    args:['--no-sandbox']
+  });
   const page = await browser.newPage();
   const waitForXPathOptions = { timeout: 40 };
   await page.goto(site);
