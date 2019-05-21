@@ -10,3 +10,5 @@ $ cd madliberation-itest
 $ npm install
 $ node ./App.itest.js --slow --site https://passover.lol
 ```
+
+The main script is at [App.itest.js](https://github.com/douglasnaphas/madliberation-itest/blob/master/App.itest.js).
