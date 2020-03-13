@@ -2,11 +2,11 @@
   "name": "madliberation-itest",
   "version": "2.0.2",
   "description": "Browser-based tests of the Mad Liberation web app",
-  "bin": "./App.itest.js",
+  "bin": "./App.itest.cjs",
   "type": "module",
-  "main": "App.itest.js",
+  "main": "App.itest.cjs",
   "files": [
-    "App.itest.js"
+    "App.itest.cjs"
   ],
   "scripts": {
     "test": "jest --passWithNoTests && echo 'this script is the test'"
