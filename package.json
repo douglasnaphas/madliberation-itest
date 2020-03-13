@@ -1,10 +1,11 @@
 {
   "name": "madliberation-itest",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Browser-based tests of the Mad Liberation web app",
-  "main": "index.js",
+  "bin": "./App.itest.js",
+  "main": "App.itest.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --passWithNoTests && echo 'this script is the test'"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,9 @@
     "url": "https://github.com/douglasnaphas/madliberation-itest/issues"
   },
   "homepage": "https://github.com/douglasnaphas/madliberation-itest#readme",
+  "devDependencies": {
+    "jest": "^25.1.0"
+  },
   "dependencies": {
     "commander": "^2.20.0",
     "puppeteer": "^1.11.0"
