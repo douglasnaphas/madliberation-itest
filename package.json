@@ -4,6 +4,9 @@
   "description": "Browser-based tests of the Mad Liberation web app",
   "bin": "./App.itest.js",
   "main": "App.itest.js",
+  "files": [
+    "App.itest.js"
+  ],
   "scripts": {
     "test": "jest --passWithNoTests && echo 'this script is the test'"
   },

@@ -1,8 +1,9 @@
-const puppeteer = require("puppeteer");
-const program = require("commander");
+#!/usr/bin/env node
 
-program
-  .version("1.0.0")
+import { launch } from "puppeteer";
+import { version, slow, site as _site } from "commander";
+
+version("1.0.0")
   .option(
     "-s, --site <URL>",
     "Site to run against, default https://passover.lol"
@@ -10,11 +11,11 @@ program
   .option("-L, --slow", "Run headfully in slow mode")
   .parse(process.argv);
 const slowDown = 200;
-const timeoutMs = 45000 + (program.slow ? slowDown + 2000 : 0);
+const timeoutMs = 45000 + (slow ? slowDown + 2000 : 0);
 const defaultUrl = "https://passover.lol";
-const site = program.site || defaultUrl;
+const site = _site || defaultUrl;
 const browserOptions = {
-  headless: program.slow ? false : true,
+  headless: slow ? false : true,
   args: ["--no-sandbox"]
 };
 browserOptions.slowMo = slowDown;
@@ -145,7 +146,7 @@ const submitAllLibs = async (page, prefix) => {
 };
 
 (async () => {
-  const browser = await puppeteer.launch(browserOptions);
+  const browser = await launch(browserOptions);
   const page = await browser.newPage();
   await page.goto(site);
 
@@ -230,7 +231,7 @@ const submitAllLibs = async (page, prefix) => {
   ////////////////////////////////////////////////////////////////////////////////
 
   // Add a second player
-  const browser2 = await puppeteer.launch(browserOptions);
+  const browser2 = await launch(browserOptions);
   const page2 = await browser2.newPage();
   await page2.goto(site);
   // Player 2
