@@ -1,6 +1,6 @@
 {
   "name": "madliberation-itest",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Browser-based tests of the Mad Liberation web app",
   "bin": "./App.itest.js",
   "type": "module",
