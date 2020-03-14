@@ -5,7 +5,7 @@ const puppeteer = require("puppeteer");
 const commander = require("commander");
 
 commander
-  .version("2.0.5")
+  .version("2.1.0")
   .option(
     "-s, --site <URL>",
     "Site to run against, default https://passover.lol"
@@ -388,4 +388,7 @@ const submitAllLibs = async (page, prefix) => {
   // Close browsers
   await browser.close();
   await browser2.close();
+
+  // Print the roomCode so caller can clean up
+  console.log(`madliberation-itest roomCode: ${roomCode}`);
 })();
