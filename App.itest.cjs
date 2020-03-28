@@ -155,12 +155,6 @@ const submitAllLibs = async (page, prefix) => {
   ////////////////////////////////////////////////////////////////////////////////
   // Home Page
   await page
-    .waitForXPath('//*[text()="Lead a seder"]', waitOptions)
-    .catch(async e => {
-      failTest(e, "Lead a seder button not found", browser);
-    });
-
-  await page
     .waitForXPath('//*[text()="Join a seder"]', waitOptions)
     .catch(async e => {
       failTest(e, "Join a seder button not found", browser);
