@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "commander": "^2.20.0",
-    "puppeteer": "^2.1.1"
+    "puppeteer": "^5.5.0"
   }
 }
