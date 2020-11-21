@@ -5,7 +5,7 @@ const puppeteer = require("puppeteer");
 const commander = require("commander");
 
 commander
-  .version("2.2.1")
+  .version("2.2.2")
   .option(
     "-s, --site <URL>",
     "Site to run against, default https://passover.lol"
@@ -18,7 +18,7 @@ const defaultUrl = "https://passover.lol";
 const site = commander.site || defaultUrl;
 const browserOptions = {
   headless: commander.slow ? false : true,
-  args: ["--no-sandbox"]
+  args: ["--no-sandbox"],
 };
 browserOptions.slowMo = slowDown;
 
@@ -35,12 +35,12 @@ const typeOptions = { delay: 90 };
 const itWait = async ({ page, madliberationid }) => {
   await page
     .waitForSelector(`[madliberationid="${madliberationid}"]`, waitOptions)
-    .catch(async e => {
+    .catch(async (e) => {
       failTest(e, `Could not find ${madliberationid}`);
     });
 };
 const itWaitForAttribute = async (page, attribute) => {
-  await page.waitForSelector(`[${attribute}]`, waitOptions).catch(async e => {
+  await page.waitForSelector(`[${attribute}]`, waitOptions).catch(async (e) => {
     failTest(e, `Could not find attribute ${attribute}`);
   });
 };
@@ -48,7 +48,7 @@ const itClick = async ({ page, madliberationid }) => {
   await itWait({ page: page, madliberationid: madliberationid });
   await page
     .click(`[madliberationid="${madliberationid}"]`, clickOptions)
-    .catch(async e => {
+    .catch(async (e) => {
       failTest(e, `Could not click ${madliberationid}`);
     });
 };
@@ -56,7 +56,7 @@ const itType = async ({ page, madliberationid, text }) => {
   await itClick({ page: page, madliberationid: madliberationid });
   await page
     .type(`[madliberationid="${madliberationid}"]`, text, typeOptions)
-    .catch(async e => {
+    .catch(async (e) => {
       failTest(e, `Could not type into ${madliberationid}`);
     });
 };
@@ -64,8 +64,8 @@ const itNavigate = async ({ page, madliberationid }) => {
   await itWait({ page: page, madliberationid: madliberationid });
   await Promise.all([
     page.click(`[madliberationid="${madliberationid}"]`, clickOptions),
-    page.waitForNavigation(waitForNavigationOptions)
-  ]).catch(async e => {
+    page.waitForNavigation(waitForNavigationOptions),
+  ]).catch(async (e) => {
     failTest(e, `Could not navigate by clicking on ${madliberationid}`);
   });
 };
@@ -73,40 +73,40 @@ const itGetText = async ({ page, madliberationid }) => {
   await itWait({ page: page, madliberationid: madliberationid });
   const text = await page
     .$$(`[madliberationid="${madliberationid}"]`)
-    .then(a => {
+    .then((a) => {
       if (!Array.isArray(a) || a.length < 1) {
         throw new Error(`Could not get text from ${madliberationid}`);
       }
       return a[0].getProperty("textContent");
     })
-    .then(textContent => {
+    .then((textContent) => {
       return textContent.jsonValue();
     })
-    .catch(async e => {
+    .catch(async (e) => {
       failTest(e, `Failed getting text content of ${madliberationid}`);
     });
   return text;
 };
 const itGetGroupText = async (page, containerMLId, groupName) => {
   await itWait({ page: page, madliberationid: containerMLId }).catch(
-    async e => {
+    async (e) => {
       failTest(e, `Failed to find container ${containerMLId}`);
     }
   );
   const container = await page
     .$(`[madliberationid="${containerMLId}"]`)
-    .catch(async e => {
+    .catch(async (e) => {
       failTest(e, `Failed to get container ${containerMLId}`);
     });
   const texts = await container
-    .$$eval(`[${groupName}]`, nodes => nodes.map(n => n.innerText))
-    .catch(async e => {
+    .$$eval(`[${groupName}]`, (nodes) => nodes.map((n) => n.innerText))
+    .catch(async (e) => {
       failTest(e, `Failed to get group ${groupName}`);
     });
   return texts;
 };
 const itGetArrayByAttribute = async (page, attribute) => {
-  const handles = await page.$$(`[${attribute}]`).catch(async e => {
+  const handles = await page.$$(`[${attribute}]`).catch(async (e) => {
     failTest(e, `Failed getting array of elements with attribute ${attribute}`);
   });
   return handles;
@@ -116,9 +116,9 @@ const submitAllLibs = async (page, prefix) => {
   const answers = [];
   const progressText = await itGetText({
     page: page,
-    madliberationid: "lib-progress"
+    madliberationid: "lib-progress",
   });
-  const progress = progressText.split("/").map(n => parseInt(n.trim()));
+  const progress = progressText.split("/").map((n) => parseInt(n.trim()));
   if (progress.length < 2) {
     failTest("/play page", "did not find X / Y showing lib progress");
   }
@@ -129,7 +129,7 @@ const submitAllLibs = async (page, prefix) => {
     await itType({
       page: page,
       madliberationid: `answer-${currentLib - 1}`,
-      text: ans
+      text: ans,
     });
     answers.push(ans);
     // If we're on the last lib, submit and return
@@ -137,7 +137,7 @@ const submitAllLibs = async (page, prefix) => {
       await itClick({ page: page, madliberationid: "submit-answers" });
       await itNavigate({
         page: page,
-        madliberationid: "yes-submit-libs-button"
+        madliberationid: "yes-submit-libs-button",
       });
       return answers;
     }
@@ -156,7 +156,7 @@ const submitAllLibs = async (page, prefix) => {
   // Home Page
   await page
     .waitForXPath('//*[text()="Join a seder"]', waitOptions)
-    .catch(async e => {
+    .catch(async (e) => {
       failTest(e, "Join a seder button not found", browser);
     });
 
@@ -195,7 +195,7 @@ const submitAllLibs = async (page, prefix) => {
   await itWait({ page: page, madliberationid: "explain-page" });
   await itNavigate({
     page: page,
-    madliberationid: "proceed-from-explanation-button"
+    madliberationid: "proceed-from-explanation-button",
   });
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -211,14 +211,14 @@ const submitAllLibs = async (page, prefix) => {
   await itWait({ page: page, madliberationid: "your-room-code" });
   const roomCode = await itGetText({
     page: page,
-    madliberationid: "your-room-code"
+    madliberationid: "your-room-code",
   });
   // Got the Room Code, enter the leader's Game Name
   const leaderName = `ITestLdr ${roomCode}`;
   await itType({
     page: page,
     madliberationid: "ringleader-game-name-text-field",
-    text: leaderName
+    text: leaderName,
   });
   // Submit leader Game Name
   await itNavigate({ page: page, madliberationid: "thats-my-name-button" });
@@ -243,12 +243,12 @@ const submitAllLibs = async (page, prefix) => {
   await itType({
     page: page2,
     madliberationid: "enter-room-code-text-field",
-    text: roomCode
+    text: roomCode,
   });
   await itType({
     page: page2,
     madliberationid: "game-name-text-field",
-    text: player2Name
+    text: player2Name,
   });
   await itNavigate({ page: page2, madliberationid: "join-this-seder-button" });
 
@@ -261,7 +261,7 @@ const submitAllLibs = async (page, prefix) => {
   // Verify both players are on the roster
   const leaderNameFromTable = await itGetText({
     page: page,
-    madliberationid: "pc0"
+    madliberationid: "pc0",
   });
   if (leaderNameFromTable != leaderName) {
     failTest(
@@ -271,7 +271,7 @@ const submitAllLibs = async (page, prefix) => {
   }
   const p2NameFromTable = await itGetText({
     page: page,
-    madliberationid: "pc1"
+    madliberationid: "pc1",
   });
   if (p2NameFromTable != player2Name) {
     failTest(
@@ -285,7 +285,7 @@ const submitAllLibs = async (page, prefix) => {
   // Confirm
   await itNavigate({
     page: page,
-    madliberationid: "confirm-thats-everyone-button"
+    madliberationid: "confirm-thats-everyone-button",
   });
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -305,7 +305,7 @@ const submitAllLibs = async (page, prefix) => {
   // Player 2: get assignments, complete them, and submit
   await itNavigate({
     page: page2,
-    madliberationid: "player-click-this-button"
+    madliberationid: "player-click-this-button",
   });
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -319,7 +319,7 @@ const submitAllLibs = async (page, prefix) => {
   // Player 2: not going to read the script
   await itNavigate({
     page: page2,
-    madliberationid: "use-someone-elses-device-button"
+    madliberationid: "use-someone-elses-device-button",
   });
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -343,8 +343,8 @@ const submitAllLibs = async (page, prefix) => {
     await itWaitForAttribute(page, "mlnoncontent");
     // Get the value of madliberationid
     const id = await page
-      .$eval("[mlnoncontent]", el => el.getAttribute("madliberationid"))
-      .catch(async e => {
+      .$eval("[mlnoncontent]", (el) => el.getAttribute("madliberationid"))
+      .catch(async (e) => {
         failTest(e, "failed to get madliberationid");
       });
     if (id == "pass-this-device") {
@@ -355,7 +355,7 @@ const submitAllLibs = async (page, prefix) => {
         "page",
         "madliberationanswer"
       );
-      libTexts.forEach(t => {
+      libTexts.forEach((t) => {
         libs.push(t);
       });
       itClick({ page: page, madliberationid: "next-page-button" });
@@ -366,7 +366,7 @@ const submitAllLibs = async (page, prefix) => {
     }
     failTest("/read error", "failed to loop through script pages");
   }
-  leaderAnswers.concat(p2Answers).forEach(a => {
+  leaderAnswers.concat(p2Answers).forEach((a) => {
     if (!libs.includes(a)) {
       failTest("/read failure", `submitted lib not inserted in script: ${a}`);
     }
