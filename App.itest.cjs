@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const puppeteer = require("puppeteer");
-// import { version, slow, site as _site } from "commander";
 const commander = require("commander");
 
 commander
@@ -13,11 +12,11 @@ commander
   .option("-L, --slow", "Run headfully in slow mode")
   .parse(process.argv);
 const slowDown = 200;
-const timeoutMs = 45000 + (commander.slow ? slowDown + 2000 : 0);
+const timeoutMs = 45000 + (commander.opts().slow ? slowDown + 2000 : 0);
 const defaultUrl = "https://passover.lol";
-const site = commander.site || defaultUrl;
+const site = commander.opts().site || defaultUrl;
 const browserOptions = {
-  headless: commander.slow ? false : true,
+  headless: commander.opts().slow ? false : true,
   args: ["--no-sandbox"],
 };
 browserOptions.slowMo = slowDown;
