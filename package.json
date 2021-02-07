@@ -28,7 +28,7 @@
     "jest": "^25.1.0"
   },
   "dependencies": {
-    "commander": "^2.20.0",
-    "puppeteer": "^5.5.0"
+    "commander": "^7.0.0",
+    "puppeteer": "^7.0.1"
   }
 }
