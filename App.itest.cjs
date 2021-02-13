@@ -10,11 +10,13 @@ commander
     "Site to run against, default https://passover.lol"
   )
   .option("-L, --slow", "Run headfully in slow mode")
+  .option("-I, --idp-url <URL>", "The URL expected after clicking 'Log in'")
   .parse(process.argv);
 const slowDown = 200;
 const timeoutMs = 45000 + (commander.opts().slow ? slowDown + 2000 : 0);
 const defaultUrl = "https://passover.lol";
 const site = commander.opts().site || defaultUrl;
+const idpUrl = commander.opts().idpUrl;
 const browserOptions = {
   headless: commander.opts().slow ? false : true,
   args: ["--no-sandbox"],
@@ -59,7 +61,16 @@ const itType = async ({ page, madliberationid, text }) => {
       failTest(e, `Could not type into ${madliberationid}`);
     });
 };
-const itNavigate = async ({ page, madliberationid }) => {
+const assertOnUrl = ({ page, expectedUrl }) => {
+  if (expectedUrl !== page.url()) {
+    failTest(
+      "unexpected URL",
+      `expected URL to be ${expectedUrl}` +
+        ` after navigation, got ${page.url()}`
+    );
+  }
+};
+const itNavigate = async ({ page, madliberationid, expectedLandingPage }) => {
   await itWait({ page: page, madliberationid: madliberationid });
   await Promise.all([
     page.click(`[madliberationid="${madliberationid}"]`, clickOptions),
@@ -67,6 +78,9 @@ const itNavigate = async ({ page, madliberationid }) => {
   ]).catch(async (e) => {
     failTest(e, `Could not navigate by clicking on ${madliberationid}`);
   });
+  if (expectedLandingPage) {
+    assertOnUrl({ page, expectedUrl: expectedLandingPage });
+  }
 };
 const itGetText = async ({ page, madliberationid }) => {
   await itWait({ page: page, madliberationid: madliberationid });
@@ -147,7 +161,9 @@ const submitAllLibs = async (page, prefix) => {
 };
 
 (async () => {
+  const browsers = []; // so we can close them all when failing a test, someday
   const browser = await puppeteer.launch(browserOptions);
+  browsers.push(browser);
   const page = await browser.newPage();
   await page.goto(site);
 
@@ -179,6 +195,8 @@ const submitAllLibs = async (page, prefix) => {
   ////////////////////////////////////////////////////////////////////////////////
   // Confirm the How to Play page is displayed
   await itWait({ page: page, madliberationid: "how-to-play-page" });
+  // Confirm that the location has the expected hash
+  assertOnUrl({ page, expectedUrl: `${site}/#/how-to-play` });
 
   // Go back to the Home Page
   await itClick({ page: page, madliberationid: "app-bar-menu-icon-button" });
@@ -225,17 +243,21 @@ const submitAllLibs = async (page, prefix) => {
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
 
-  // Add a second player
+  // Add a second player, who will log in
   const browser2 = await puppeteer.launch(browserOptions);
+  browsers.push(browser2);
   const page2 = await browser2.newPage();
   await page2.goto(site);
   // Player 2
+  await itNavigate({ page: page2, madliberationid: "login-button" });
+  assertOnUrl({ page: page2, expectedUrl: idpUrl });
+
   // Click Join a Seder button
-  await itNavigate({ page: page2, madliberationid: "join-a-seder-button" });
+  // await itNavigate({ page: page2, madliberationid: "join-a-seder-button" });
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  await itWait({ page: page2, madliberationid: "enter-room-code-page" });
+  // await itWait({ page: page2, madliberationid: "enter-room-code-page" });
 
   // // Enter Room Code and Game Name
   // const player2Name = `ITestP2 ${roomCode}`;
