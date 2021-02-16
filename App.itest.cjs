@@ -4,7 +4,7 @@ const puppeteer = require("puppeteer");
 const commander = require("commander");
 
 commander
-  .version("2.2.2")
+  .version("3.0.0")
   .option(
     "-s, --site <URL>",
     "Site to run against, default https://passover.lol"
