@@ -188,12 +188,9 @@ const submitAllLibs = async (page, prefix) => {
   const user2NameLength = 8;
   const user2Name = randString({ numLetters: user2NameLength });
   const user2TempPasswordLength = 10;
-  // + '1Aa!' because I still have pw requirements until https://github.com/douglasnaphas/madliberation/issues/279 is done
-  const user2TempPassword =
-    randString({ numLetters: user2TempPasswordLength }) + "1Aa!";
+  const user2TempPassword = randString({ numLetters: user2TempPasswordLength });
   const user2PasswordLength = 8;
-  const user2Password =
-    randString({ numLetters: user2PasswordLength }) + "1Aa!";
+  const user2Password = randString({ numLetters: user2PasswordLength });
 
   const AWS = require("aws-sdk");
   const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider(
