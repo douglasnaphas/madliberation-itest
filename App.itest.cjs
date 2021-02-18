@@ -2,6 +2,7 @@
 
 const puppeteer = require("puppeteer");
 const commander = require("commander");
+const crypto = require("crypto");
 
 commander
   .version("3.0.0")
@@ -11,12 +12,14 @@ commander
   )
   .option("-L, --slow", "Run headfully in slow mode")
   .option("-I, --idp-url <URL>", "The URL expected after clicking 'Log in'")
+  .option("--user-pool-id <ID>", "The User Pool Id for the web app")
   .parse(process.argv);
 const slowDown = 200;
 const timeoutMs = 45000 + (commander.opts().slow ? slowDown + 2000 : 0);
 const defaultUrl = "https://passover.lol";
 const site = commander.opts().site || defaultUrl;
 const idpUrl = commander.opts().idpUrl;
+const userPoolId = commander.opts().userPoolId;
 const browserOptions = {
   headless: commander.opts().slow ? false : true,
   args: ["--no-sandbox"],
@@ -29,6 +32,7 @@ const failTest = async (err, msg, browser) => {
   if (browser) await browser.close();
   process.exit(1);
 };
+
 const waitOptions = { timeout: timeoutMs /*, visible: true*/ };
 const waitForNavigationOptions = { timeout: timeoutMs };
 const clickOptions = { delay: 200 };
@@ -161,6 +165,69 @@ const submitAllLibs = async (page, prefix) => {
 };
 
 (async () => {
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  // Setup
+  // prereq: for generating random user credentials
+  // Set up test user
+  const randString = (options) => {
+    const { numLetters } = options;
+    const alphabet = (
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz"
+    ).split("");
+    let str = "";
+    for (let i = 0; i < numLetters; i++) {
+      str =
+        str +
+        alphabet[
+          parseInt(crypto.randomBytes(3).toString("hex"), 16) % alphabet.length
+        ];
+    }
+    return str;
+  };
+  const user2NameLength = 8;
+  const user2Name = randString({ numLetters: user2NameLength });
+  const user2TempPasswordLength = 10;
+  // + '1Aa!' because I still have pw requirements until https://github.com/douglasnaphas/madliberation/issues/279 is done
+  const user2TempPassword =
+    randString({ numLetters: user2TempPasswordLength }) + "1Aa!";
+  const user2PasswordLength = 8;
+  const user2Password =
+    randString({ numLetters: user2PasswordLength }) + "1Aa!";
+
+  const AWS = require("aws-sdk");
+  const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider(
+    {
+      apiVersion: "2016-04-18",
+    }
+  );
+  const adminCreateUserParams = {
+    UserPoolId: userPoolId,
+    Username: user2Name,
+    MessageAction: "SUPPRESS",
+    TemporaryPassword: user2TempPassword,
+    ValidationData: [
+      {
+        Name: "email_verified",
+        Value: "True",
+      },
+    ],
+  };
+  const createUserResponse = await new Promise((resolve, reject) => {
+    cognitoidentityserviceprovider.adminCreateUser(
+      adminCreateUserParams,
+      (err, data) => {
+        resolve({ err, data });
+      }
+    );
+  });
+  if (createUserResponse.err) {
+    failTest(createUserResponse.err, "Failed to create a user in setup");
+  }
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  // Actual test
+
   const browsers = []; // so we can close them all when failing a test, someday
   const browser = await puppeteer.launch(browserOptions);
   browsers.push(browser);
@@ -251,7 +318,30 @@ const submitAllLibs = async (page, prefix) => {
   // Player 2
   await itNavigate({ page: page2, madliberationid: "login-button" });
   assertOnUrl({ page: page2, expectedUrl: idpUrl });
-
+  await page2
+    .waitForSelector(`input#signInFormUsername[type='text']`, {
+      ...waitOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not find username input`, browser2);
+    });
+  await page2
+    .click(`input#signInFormUsername[type='text']`, {
+      ...clickOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not click username input`, browser2);
+    });
+  await page2
+    .type(`input#signInFormUsername[type='text']`, user2Name, {
+      ...typeOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not enter username`, browser2);
+    });
   // Click Join a Seder button
   // await itNavigate({ page: page2, madliberationid: "join-a-seder-button" });
 
@@ -406,4 +496,15 @@ const submitAllLibs = async (page, prefix) => {
 
   // Print the roomCode so caller can clean up
   // console.log(`madliberation-itest roomCode: ${roomCode}`);
+
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  // Clean up
+
+  // test user
+
+  // seder
+
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 })();
