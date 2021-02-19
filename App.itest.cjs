@@ -13,6 +13,10 @@ commander
   .option("-L, --slow", "Run headfully in slow mode")
   .option("-I, --idp-url <URL>", "The URL expected after clicking 'Log in'")
   .option("--user-pool-id <ID>", "The User Pool Id for the web app")
+  .option(
+    "--setup-only",
+    "Create a User Pool user and exit, do not launch a browser"
+  )
   .parse(process.argv);
 const slowDown = 200;
 const timeoutMs = 45000 + (commander.opts().slow ? slowDown + 2000 : 0);
@@ -20,6 +24,7 @@ const defaultUrl = "https://passover.lol";
 const site = commander.opts().site || defaultUrl;
 const idpUrl = commander.opts().idpUrl;
 const userPoolId = commander.opts().userPoolId;
+const setupOnly = commander.opts().setupOnly;
 const browserOptions = {
   headless: commander.opts().slow ? false : true,
   args: ["--no-sandbox"],
@@ -185,6 +190,42 @@ const submitAllLibs = async (page, prefix) => {
     }
     return str;
   };
+
+  const AWS = require("aws-sdk");
+  const createUser = async (userName, tempPassword) => {
+    const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider(
+      {
+        apiVersion: "2016-04-18",
+      }
+    );
+    const adminCreateUserParams = {
+      UserPoolId: userPoolId,
+      Username: userName,
+      MessageAction: "SUPPRESS",
+      TemporaryPassword: tempPassword,
+      ValidationData: [
+        {
+          Name: "email_verified",
+          Value: "True",
+        },
+      ],
+    };
+    const createUserResponse = await new Promise((resolve, reject) => {
+      cognitoidentityserviceprovider.adminCreateUser(
+        adminCreateUserParams,
+        (err, data) => {
+          resolve({ err, data });
+        }
+      );
+    });
+    if (createUserResponse.err) {
+      failTest(createUserResponse.err, "Failed to create a user in setup");
+    }
+    console.log(
+      `created user with username ${userName}` +
+        (setupOnly ? ` and temp password ${tempPassword}` : "")
+    );
+  };
   const user2NameLength = 8;
   const user2Name = randString({ numLetters: user2NameLength });
   const user2TempPasswordLength = 10;
@@ -192,35 +233,12 @@ const submitAllLibs = async (page, prefix) => {
   const user2PasswordLength = 8;
   const user2Password = randString({ numLetters: user2PasswordLength });
 
-  const AWS = require("aws-sdk");
-  const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider(
-    {
-      apiVersion: "2016-04-18",
-    }
-  );
-  const adminCreateUserParams = {
-    UserPoolId: userPoolId,
-    Username: user2Name,
-    MessageAction: "SUPPRESS",
-    TemporaryPassword: user2TempPassword,
-    ValidationData: [
-      {
-        Name: "email_verified",
-        Value: "True",
-      },
-    ],
-  };
-  const createUserResponse = await new Promise((resolve, reject) => {
-    cognitoidentityserviceprovider.adminCreateUser(
-      adminCreateUserParams,
-      (err, data) => {
-        resolve({ err, data });
-      }
-    );
-  });
-  if (createUserResponse.err) {
-    failTest(createUserResponse.err, "Failed to create a user in setup");
+  await createUser(user2Name, user2TempPassword);
+  if (setupOnly) {
+    console.log("--setup-only supplied, exiting");
+    process.exit(0);
   }
+
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
   // Actual test
@@ -315,8 +333,11 @@ const submitAllLibs = async (page, prefix) => {
   // Player 2
   await itNavigate({ page: page2, madliberationid: "login-button" });
   assertOnUrl({ page: page2, expectedUrl: idpUrl });
+
+  // Enter username
+  const usernameSelector = `input#signInFormUsername[type='text']`;
   await page2
-    .waitForSelector(`input#signInFormUsername[type='text']`, {
+    .waitForSelector(usernameSelector, {
       ...waitOptions,
       visible: true,
     })
@@ -324,7 +345,7 @@ const submitAllLibs = async (page, prefix) => {
       failTest(e, `Could not find username input`, browser2);
     });
   await page2
-    .click(`input#signInFormUsername[type='text']`, {
+    .click(usernameSelector, {
       ...clickOptions,
       visible: true,
     })
@@ -332,15 +353,115 @@ const submitAllLibs = async (page, prefix) => {
       failTest(e, `Could not click username input`, browser2);
     });
   await page2
-    .type(`input#signInFormUsername[type='text']`, user2Name, {
+    .type(usernameSelector, user2Name, {
       ...typeOptions,
       visible: true,
     })
     .catch(async (e) => {
       failTest(e, `Could not enter username`, browser2);
     });
+
+  // Enter temp password
+  const passwordSelector = `input#signInFormPassword[type='password']`;
+  await page2
+    .waitForSelector(passwordSelector, {
+      ...waitOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not find password input`, browser2);
+    });
+  await page2
+    .click(passwordSelector, {
+      ...clickOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not click password input`, browser2);
+    });
+  await page2
+    .type(passwordSelector, user2TempPassword, {
+      ...typeOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not enter password`, browser2);
+    });
+
+  // Click Sign In
+  const submitButtonSelector = `input[name='signInSubmitButton'][type='Submit']`;
+  await page2
+    .waitForSelector(submitButtonSelector, {
+      ...waitOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not find submit button`, browser2);
+    });
+  await page2
+    .click(submitButtonSelector, {
+      ...clickOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not click submit button`, browser2);
+    });
+
+  // Reset the password
+  const newPasswordSelector = `input#new_password[type='password']`;
+  await page2
+    .waitForSelector(newPasswordSelector, {
+      ...waitOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not find new password input`, browser2);
+    });
+  await page2
+    .click(newPasswordSelector, {
+      ...clickOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not click new password input`, browser2);
+    });
+  await page2
+    .type(newPasswordSelector, user2Password, {
+      ...typeOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not enter new password`, browser2);
+    });
+  const confirmPasswordSelector = `input#confirm_password[type='password']`;
+  await page2
+    .click(confirmPasswordSelector, {
+      ...clickOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not click confirm password input`, browser2);
+    });
+  await page2
+    .type(confirmPasswordSelector, user2Password, {
+      ...typeOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not re-enter new password`, browser2);
+    });
+  const sendButtonSelector = `button[name="reset_password"][type='submit']`;
+  await page2
+    .click(sendButtonSelector, {
+      ...clickOptions,
+      visible: true,
+    })
+    .catch(async (e) => {
+      failTest(e, `Could not submit password change`, browser2);
+    });
+
   // Click Join a Seder button
-  // await itNavigate({ page: page2, madliberationid: "join-a-seder-button" });
+  await itNavigate({ page: page2, madliberationid: "join-a-seder-button" });
 
   ////////////////////////////////////////////////////////////////////////////////
 
