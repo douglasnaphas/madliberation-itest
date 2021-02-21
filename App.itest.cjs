@@ -203,6 +203,7 @@ const submitAllLibs = async (page, prefix) => {
       Username: userName,
       MessageAction: "SUPPRESS",
       TemporaryPassword: tempPassword,
+      UserAttributes: [{ Name: "nickname", Value: `nn-${userName}` }],
       ValidationData: [
         {
           Name: "email_verified",
