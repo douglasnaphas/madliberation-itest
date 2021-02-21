@@ -227,7 +227,8 @@ const submitAllLibs = async (page, prefix) => {
     );
   };
   const user2NameLength = 8;
-  const user2Name = randString({ numLetters: user2NameLength });
+  const user2Name =
+    randString({ numLetters: user2NameLength }) + "@example.com";
   const user2TempPasswordLength = 10;
   const user2TempPassword = randString({ numLetters: user2TempPasswordLength });
   const user2PasswordLength = 8;
