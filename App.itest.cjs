@@ -294,17 +294,17 @@ const submitAllLibs = async (page, prefix) => {
   ////////////////////////////////////////////////////////////////////////////////
 
   await itWait({ page: page, madliberationid: "explain-page" });
-  // await itNavigate({
-  //   page: page,
-  //   madliberationid: "proceed-from-explanation-button",
-  // });
+  await itNavigate({
+    page: page,
+    madliberationid: "proceed-from-explanation-button",
+  });
 
   // ////////////////////////////////////////////////////////////////////////////////
 
-  // await itWait({ page: page, madliberationid: "pick-your-script-page" });
+  await itWait({ page: page, madliberationid: "pick-your-script-page" });
 
-  // // Pick the Practice Script
-  // await itClick({ page: page, madliberationid: "Practice Script" });
+  // Pick the Practice Script
+  await itClick({ page: page, madliberationid: "Practice Script" });
   // await itNavigate({ page: page, madliberationid: "pick-this-script-button" });
 
   // ////////////////////////////////////////////////////////////////////////////////
