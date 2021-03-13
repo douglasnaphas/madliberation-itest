@@ -299,31 +299,31 @@ const submitAllLibs = async (page, prefix) => {
     madliberationid: "proceed-from-explanation-button",
   });
 
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
   await itWait({ page: page, madliberationid: "pick-your-script-page" });
 
   // Pick the Practice Script
   await page.screenshot({ path: "pick-your-script-page.jpeg" });
   await itClick({ page: page, madliberationid: "Practice Script" });
-  // await itNavigate({ page: page, madliberationid: "pick-this-script-button" });
+  await itNavigate({ page: page, madliberationid: "pick-this-script-button" });
 
-  // ////////////////////////////////////////////////////////////////////////////////
-  // // Wait for a Room Code to appear
-  // await itWait({ page: page, madliberationid: "your-room-code" });
-  // const roomCode = await itGetText({
-  //   page: page,
-  //   madliberationid: "your-room-code",
-  // });
-  // // Got the Room Code, enter the leader's Game Name
-  // const leaderName = `ITestLdr ${roomCode}`;
-  // await itType({
-  //   page: page,
-  //   madliberationid: "ringleader-game-name-text-field",
-  //   text: leaderName,
-  // });
-  // // Submit leader Game Name
-  // await itNavigate({ page: page, madliberationid: "thats-my-name-button" });
+  ////////////////////////////////////////////////////////////////////////////////
+  // Wait for a Room Code to appear
+  await itWait({ page: page, madliberationid: "your-room-code" });
+  const roomCode = await itGetText({
+    page: page,
+    madliberationid: "your-room-code",
+  });
+  // Got the Room Code, enter the leader's Game Name
+  const leaderName = `ITestLdr ${roomCode}`;
+  await itType({
+    page: page,
+    madliberationid: "ringleader-game-name-text-field",
+    text: leaderName,
+  });
+  // Submit leader Game Name
+  await itNavigate({ page: page, madliberationid: "thats-my-name-button" });
 
   ////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
@@ -468,148 +468,148 @@ const submitAllLibs = async (page, prefix) => {
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  // await itWait({ page: page2, madliberationid: "enter-room-code-page" });
+  await itWait({ page: page2, madliberationid: "enter-room-code-page" });
 
-  // // Enter Room Code and Game Name
-  // const player2Name = `ITestP2 ${roomCode}`;
-  // await itType({
-  //   page: page2,
-  //   madliberationid: "enter-room-code-text-field",
-  //   text: roomCode,
-  // });
-  // await itType({
-  //   page: page2,
-  //   madliberationid: "game-name-text-field",
-  //   text: player2Name,
-  // });
-  // await itNavigate({ page: page2, madliberationid: "join-this-seder-button" });
+  // Enter Room Code and Game Name
+  const player2Name = `ITestP2 ${roomCode}`;
+  await itType({
+    page: page2,
+    madliberationid: "enter-room-code-text-field",
+    text: roomCode,
+  });
+  await itType({
+    page: page2,
+    madliberationid: "game-name-text-field",
+    text: player2Name,
+  });
+  await itNavigate({ page: page2, madliberationid: "join-this-seder-button" });
 
-  // ////////////////////////////////////////////////////////////////////////////////
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // // Leader checks roster
-  // // Click No, Check Again so Player 2 shows up on the roster
-  // await itClick({ page: page, madliberationid: "no-check-again-button" });
-  // // Verify both players are on the roster
-  // const leaderNameFromTable = await itGetText({
-  //   page: page,
-  //   madliberationid: "pc0",
-  // });
-  // if (leaderNameFromTable != leaderName) {
-  //   failTest(
-  //     "wrong name on roster",
-  //     `expected ${leaderName}, got ` + `${leaderNameFromTable}`
-  //   );
-  // }
-  // const p2NameFromTable = await itGetText({
-  //   page: page,
-  //   madliberationid: "pc1",
-  // });
-  // if (p2NameFromTable != player2Name) {
-  //   failTest(
-  //     "wrong name on roster",
-  //     `expected ${player2Name}, got ` + `${p2NameFromTable}`
-  //   );
-  // }
+  // Leader checks roster
+  // Click No, Check Again so Player 2 shows up on the roster
+  await itClick({ page: page, madliberationid: "no-check-again-button" });
+  // Verify both players are on the roster
+  const leaderNameFromTable = await itGetText({
+    page: page,
+    madliberationid: "pc0",
+  });
+  if (leaderNameFromTable != leaderName) {
+    failTest(
+      "wrong name on roster",
+      `expected ${leaderName}, got ` + `${leaderNameFromTable}`
+    );
+  }
+  const p2NameFromTable = await itGetText({
+    page: page,
+    madliberationid: "pc1",
+  });
+  if (p2NameFromTable != player2Name) {
+    failTest(
+      "wrong name on roster",
+      `expected ${player2Name}, got ` + `${p2NameFromTable}`
+    );
+  }
 
-  // // Click Thats Everyone
-  // await itClick({ page: page, madliberationid: "thats-everyone-button" });
-  // // Confirm
-  // await itNavigate({
-  //   page: page,
-  //   madliberationid: "confirm-thats-everyone-button",
-  // });
+  // Click Thats Everyone
+  await itClick({ page: page, madliberationid: "thats-everyone-button" });
+  // Confirm
+  await itNavigate({
+    page: page,
+    madliberationid: "confirm-thats-everyone-button",
+  });
 
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // // Leader: get assignments, complete them, and submit
-  // await itNavigate({ page: page, madliberationid: "leader-click-this-button" });
+  // Leader: get assignments, complete them, and submit
+  await itNavigate({ page: page, madliberationid: "leader-click-this-button" });
 
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // // Make sure we're on the /play page
-  // await itWait({ page: page, madliberationid: "lib-progress" });
-  // const leaderAnswers = await submitAllLibs(page, "leader");
+  // Make sure we're on the /play page
+  await itWait({ page: page, madliberationid: "lib-progress" });
+  const leaderAnswers = await submitAllLibs(page, "leader");
 
-  // ////////////////////////////////////////////////////////////////////////////////
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // // Player 2: get assignments, complete them, and submit
-  // await itNavigate({
-  //   page: page2,
-  //   madliberationid: "player-click-this-button",
-  // });
+  // Player 2: get assignments, complete them, and submit
+  await itNavigate({
+    page: page2,
+    madliberationid: "player-click-this-button",
+  });
 
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // // Make sure we're on the /play page
-  // await itWait({ page: page2, madliberationid: "lib-progress" });
-  // const p2Answers = await submitAllLibs(page2, "p2");
+  // Make sure we're on the /play page
+  await itWait({ page: page2, madliberationid: "lib-progress" });
+  const p2Answers = await submitAllLibs(page2, "p2");
 
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // // Player 2: not going to read the script
-  // await itNavigate({
-  //   page: page2,
-  //   madliberationid: "use-someone-elses-device-button",
-  // });
+  // Player 2: not going to read the script
+  await itNavigate({
+    page: page2,
+    madliberationid: "use-someone-elses-device-button",
+  });
 
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // await itWait({ page: page2, madliberationid: "done-not-reading-page" });
+  await itWait({ page: page2, madliberationid: "done-not-reading-page" });
 
-  // ////////////////////////////////////////////////////////////////////////////////
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // // Leader: confirm both players' submissions appeared in the script
-  // await itNavigate({ page: page, madliberationid: "i-want-the-script-button" });
+  // Leader: confirm both players' submissions appeared in the script
+  await itNavigate({ page: page, madliberationid: "i-want-the-script-button" });
 
-  // ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
-  // // Wait until the Read page shows, then click the button to get to the first
-  // // reader, then get all the displayed libs
-  // await itWait({ page: page, madliberationid: "pass-this-device" });
-  // const libs = [];
-  // // loop through script pages, adding to libs
-  // while (true) {
-  //   await itWaitForAttribute(page, "mlnoncontent");
-  //   // Get the value of madliberationid
-  //   const id = await page
-  //     .$eval("[mlnoncontent]", (el) => el.getAttribute("madliberationid"))
-  //     .catch(async (e) => {
-  //       failTest(e, "failed to get madliberationid");
-  //     });
-  //   if (id == "pass-this-device") {
-  //     itClick({ page: page, madliberationid: "ready-to-read-button" });
-  //     itWait({ page: page, madliberationid: "page" });
-  //     const libTexts = await itGetGroupText(
-  //       page,
-  //       "page",
-  //       "madliberationanswer"
-  //     );
-  //     libTexts.forEach((t) => {
-  //       libs.push(t);
-  //     });
-  //     itClick({ page: page, madliberationid: "next-page-button" });
-  //     continue;
-  //   }
-  //   if (id == "seder-ended-successfully") {
-  //     break;
-  //   }
-  //   failTest("/read error", "failed to loop through script pages");
-  // }
-  // leaderAnswers.concat(p2Answers).forEach((a) => {
-  //   if (!libs.includes(a)) {
-  //     failTest("/read failure", `submitted lib not inserted in script: ${a}`);
-  //   }
-  // });
-  // if (leaderAnswers.length + p2Answers.length != libs.length) {
-  //   failTest(
-  //     "/read failure",
-  //     `submitted ${leaderAnswers.length + p2Answers.length} answers, ` +
-  //       `${libs.length} found in script`
-  //   );
-  // }
+  // Wait until the Read page shows, then click the button to get to the first
+  // reader, then get all the displayed libs
+  await itWait({ page: page, madliberationid: "pass-this-device" });
+  const libs = [];
+  // loop through script pages, adding to libs
+  while (true) {
+    await itWaitForAttribute(page, "mlnoncontent");
+    // Get the value of madliberationid
+    const id = await page
+      .$eval("[mlnoncontent]", (el) => el.getAttribute("madliberationid"))
+      .catch(async (e) => {
+        failTest(e, "failed to get madliberationid");
+      });
+    if (id == "pass-this-device") {
+      itClick({ page: page, madliberationid: "ready-to-read-button" });
+      itWait({ page: page, madliberationid: "page" });
+      const libTexts = await itGetGroupText(
+        page,
+        "page",
+        "madliberationanswer"
+      );
+      libTexts.forEach((t) => {
+        libs.push(t);
+      });
+      itClick({ page: page, madliberationid: "next-page-button" });
+      continue;
+    }
+    if (id == "seder-ended-successfully") {
+      break;
+    }
+    failTest("/read error", "failed to loop through script pages");
+  }
+  leaderAnswers.concat(p2Answers).forEach((a) => {
+    if (!libs.includes(a)) {
+      failTest("/read failure", `submitted lib not inserted in script: ${a}`);
+    }
+  });
+  if (leaderAnswers.length + p2Answers.length != libs.length) {
+    failTest(
+      "/read failure",
+      `submitted ${leaderAnswers.length + p2Answers.length} answers, ` +
+        `${libs.length} found in script`
+    );
+  }
 
   // Close browsers
   await browser.close();
