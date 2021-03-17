@@ -260,7 +260,10 @@ const submitAllLibs = async (page, prefix) => {
     });
 
   // Explain Page
-  await itNavigate({ page: page, madliberationid: "lead-a-seder-button" });
+  await itNavigate({
+    page: page,
+    madliberationid: "lead-a-seder-by-video-button",
+  });
 
   ////////////////////////////////////////////////////////////////////////////////
 
@@ -289,7 +292,10 @@ const submitAllLibs = async (page, prefix) => {
   ////////////////////////////////////////////////////////////////////////////////
 
   // Lead a seder
-  await itNavigate({ page: page, madliberationid: "lead-a-seder-button" });
+  await itNavigate({
+    page: page,
+    madliberationid: "lead-a-seder-by-video-button",
+  });
 
   ////////////////////////////////////////////////////////////////////////////////
 
